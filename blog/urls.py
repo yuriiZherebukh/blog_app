@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^post/(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='post_detail'),
     url(r'^post/new/$', views.PostCreate.as_view(), name='post_new'),
     url(r'^post/(?P<pk>[0-9]+)/edit/$', views.PostUpdate.as_view(), name='post_edit'),
+    url(r'^post/(?P<pk>[0-9]+)/delete/$', views.PostDelete.as_view(), name='post_delete'),
 ]
