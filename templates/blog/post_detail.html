@@ -12,6 +12,7 @@
             <span class="glyphicon glyphicon-pencil"></span></a> {% endif %}
         <h1>{{ post.title }}</h1>
         <p>{{ post.text|linebreaksbr }}</p>
+        <p>{{ post.pk }}</p>
     <a href="{% url 'post_list'%}">Back</a>
     </div>
 {% endblock %}
