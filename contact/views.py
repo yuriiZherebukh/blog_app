@@ -14,7 +14,9 @@ class ContactView(View):
 
         if not contact_id:
             contacts = Contact.get_all()
+            print(contacts)
             contacts = [contact.to_dict() for contact in contacts]
+            print(contacts)
             return render(request, 'contact/list.html', {'contacts': contacts})
         else:
             print(contact_id)
@@ -27,6 +29,13 @@ class ContactView(View):
         contact = Contact.get_by_id(contact_id)
         if not contact:
             return HttpResponse(status=404)
-        update_data = json.loads(request.body.decode('utf-8'))
+        update_data = json.loads(request.body)
         contact.update(**update_data)
+        return JsonResponse(contact.to_dict(), status=200)
+
+    def post(self,request):
+        contact_data = json.loads(request.body.decode('utf-8'))
+        print(request.body)
+        contact = Contact()
+        contact.create(**contact_data)
         return JsonResponse(contact.to_dict(), status=200)

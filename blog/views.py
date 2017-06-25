@@ -1,66 +1,48 @@
-from django.shortcuts import render, redirect
-from django.utils import timezone
-
-
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.views.generic.base import View
+import json
 from .models import Post
 from .forms import PostForm
-from django.views import generic
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy
 
 
-class IndexView(generic.ListView):
-    template_name = 'blog/post_list.html'
-    context_object_name = 'posts'
-    paginate_by = 5
+class PostView(View):
 
-    def get_queryset(self):
-        return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    def get(self, request, post_id=None):
+        if not post_id:
+            posts = Post.get_all()
+            print(posts)
+            posts = [post.to_dict() for post in posts]
+            print(posts)
+            return render(request, 'blog/post_list.html', {'posts': posts})
+        else:
+            print(post_id)
+            post = Post.get_by_id(post_id)
+            post = post.to_dict()
+            return JsonResponse(post, status=200)
 
+    def put(self, request, post_id=None):
+        print(request.method)
+        post = Post.get_by_id(post_id)
+        if not post:
+            return HttpResponse(status=404)
+        update_data = json.loads(request.body.decode('utf-8'))
+        post.update(**update_data)
+        return JsonResponse(post.to_dict(), status=200)
 
-class DetailView(generic.DetailView):
-    model = Post
-    template_name = 'blog/post_detail.html'
+    def post(self,request):
+        post_data = json.loads(request.body.decode('utf-8'))
+        print(request.body)
+        post = Post()
+        post.create(**post_data)
+        post.publish()
+        return JsonResponse(post.to_dict(),status=200)
 
-
-class PostCreate(CreateView):
-    model = Post
-    fields = ['title','text','image']
-    template_name = 'blog/post_edit.html'
-
-    def post(self, request):
-        self.form = PostForm(request.POST)
-        if self.form.is_valid():
-            self.post = self.form.save(commit=False)
-            self.post.author = request.user
-            self.post.published_date = timezone.now()
-            self.post.save()
-            return redirect('post_detail', pk=self.post.pk)
-        return render(request, 'blog/post_edit.html', {'form': self.form})
-
-
-class PostUpdate(UpdateView):
-    model = Post
-    fields = ['title','text','image']
-    template_name = 'blog/post_edit.html'
-
-    def post(self,request,*args,**kwargs):
-        self.post = Post.objects.get(pk=self.kwargs['pk'])  # model and primary key for article
-        self.form = PostForm(request.POST, instance=self.post)  # pass this 'post'
-        if self.form.is_valid():
-            self.post = self.form.save(commit=False)
-            self.post.author = request.user
-            self.post.published_date = timezone.now()
-            self.post.save()  # queryset,  saves this 'post'
-            return redirect('post_detail', pk=self.post.pk)
-        return render(request, 'blog/post_edit.html', {'form': self.form})
-
-
-class PostDelete(DeleteView):
-    model = Post
-    template_name = 'blog/post_delete.html'
-    success_url = reverse_lazy('post_list')
-
-
-
+    # def delete(self,post_id):
+    #     print(post_id)
+    #     post = Post.get_by_id(post_id)
+    #     if not post:
+    #         return HttpResponse(status=404)
+    #     #post.delete()
+    #     return JsonResponse(post,status=200)
 
