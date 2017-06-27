@@ -18,14 +18,18 @@ class PostView(View):
         else:
             print(post_id)
             post = Post.get_by_id(post_id)
+            print('post',post)
             post = post.to_dict()
             return JsonResponse(post, status=200)
 
-    def put(self, request, post_id=None):
+    def put(self, request, post_id):
         print(request.method)
         post = Post.get_by_id(post_id)
         if not post:
             return HttpResponse(status=404)
+        print(request.user)
+        if not post.author.id == request.user.id:
+            return HttpResponse(status=403)
         update_data = json.loads(request.body.decode('utf-8'))
         post.update(**update_data)
         return JsonResponse(post.to_dict(), status=200)
@@ -38,11 +42,11 @@ class PostView(View):
         post.publish()
         return JsonResponse(post.to_dict(),status=200)
 
-    # def delete(self,post_id):
-    #     print(post_id)
-    #     post = Post.get_by_id(post_id)
-    #     if not post:
-    #         return HttpResponse(status=404)
-    #     #post.delete()
-    #     return JsonResponse(post,status=200)
+    def delete(self,request,post_id):
+       print(post_id)
+       post = Post.get_by_id(post_id)
+       if not post:
+            return HttpResponse(status=404)
+       post.delete()
+       return HttpResponse(status=200)  # redirects to
 

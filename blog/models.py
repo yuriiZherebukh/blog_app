@@ -1,9 +1,11 @@
 from django.db import models
 from django.utils import timezone
 
+SUPERADMIN_ID = 1
+DEFAULT_IMAGE_ID = 1
 
 class Post(models.Model):
-    author = models.CharField(max_length=50)
+    author = models.ForeignKey('auth.User')
     title = models.CharField(max_length=200)
     text = models.TextField()
     created_date = models.DateTimeField(
@@ -32,7 +34,7 @@ class Post(models.Model):
     def to_dict(self,request=None):  # method rebuilds queryset ot object dictionary for our views
         return {
                 'id': self.id,
-                'author': self.author,
+                'author': self.author.username,  # returns object, need to return his name
                 'title': self.title,
                 'text': self.text,
                 'created_date': self.created_date,
@@ -40,7 +42,7 @@ class Post(models.Model):
                 'image': self.image
                 }
 
-    def create(self,author=1,title=None,text=None,image=1):
+    def create(self,author=SUPERADMIN_ID,image = DEFAULT_IMAGE_ID,title=None,text=None):
         self.author = author
         self.title = title
         self.text = text
@@ -58,4 +60,4 @@ class Post(models.Model):
         self.save()
 
     def __str__(self):
-        return self.title
+        return "{} {} type:{}".format(self.id, self.author,type(self.author))

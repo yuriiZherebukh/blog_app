@@ -19,7 +19,5 @@ from .views import ContactView
 urlpatterns = [
 
     url(r'^$', ContactView.as_view(), name='contact_view'),
-    url(r'^new/$', ContactView.as_view(), name='contact_view'),
     url(r'^(?P<contact_id>\d+)/$', ContactView.as_view(), name='contact_view'),
-    url(r'^(?P<contact_id>\d+)/edit/$', ContactView.as_view(), name='contact_view'),
 ]

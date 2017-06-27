@@ -20,7 +20,5 @@ urlpatterns = [
 
     url(r'^$', PostView.as_view(), name='post_view'),
     url(r'^post/(?P<post_id>\d+)/$', PostView.as_view(), name='post_describe'),
-    url(r'^post/new/$', PostView.as_view(), name='post_new'),
-    url(r'^post/(?P<post_id>\d+)/edit/$', PostView.as_view(), name='post_edit'),
-    url(r'^post/(?P<post_id>\d+)/delete/$', PostView.as_view(), name='post_elete'),
-]
+
+    ]

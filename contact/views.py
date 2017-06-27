@@ -39,3 +39,11 @@ class ContactView(View):
         contact = Contact()
         contact.create(**contact_data)
         return JsonResponse(contact.to_dict(), status=200)
+
+    def delete(self,request,contact_id):
+       print(contact_id)
+       contact = Contact.get_by_id(contact_id)
+       if not contact:
+            return HttpResponse(status=404)
+       contact.delete()
+       return self.get(request)
